@@ -17,11 +17,35 @@ namespace backend_challenge.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> GenerateToken([FromBody] AuthDto authDto)
+        public async Task<IActionResult> Login([FromBody] GenerateTokenDto generateTokenDto)
         {
-            var response = await _authService.GenerateTokenAsync(authDto.Email, authDto.Password);
-            var responseJson = JsonConvert.SerializeObject(response);
-            return Ok(responseJson);
+            var userAuthenticate = await _authService.GenerateTokenAsync(generateTokenDto.Email, generateTokenDto.Password);
+
+            //var jsonToken = JsonConvert.SerializeObject(tokenString);
+            //Almacenar y enviar en una cookie
+            //HttpContext.Response.Cookies.Append(
+            //    "SSID",
+            //    "Bearer " + tokenString,
+            //    new CookieOptions
+            //    {
+            //        Expires = DateTime.Now.AddDays(7),
+            //        HttpOnly = false,
+            //        Secure = false,
+            //        Path = "../challenge-frontend"
+            //    });
+
+            //HttpContext.Response.Cookies.Append("token", tokenString);
+
+            return Ok(userAuthenticate);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> GetProfile()
+        {
+           var token = Request.Headers.Authorization;
+            var response = await _authService.GetProfile(token);
+            return Ok(response);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using backend_challenge.DataAccess;
 using backend_challenge.Dto;
+using backend_challenge.Helpers;
 using backend_challenge.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,7 @@ namespace backend_challenge.Services
         }
         public async Task CreateAsync(UserDto userDto)
         {
+            userDto.Password = HashPass.HashPassword(userDto.Password);
             var entity = _mapper.Map<User>(userDto);
             
             await _db.Users.AddAsync(entity);

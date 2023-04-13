@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Policy;
+using System.Text.Json.Serialization;
 
 namespace backend_challenge.Models
 {
@@ -15,8 +17,12 @@ namespace backend_challenge.Models
         [Required]
         public string Password { get; set; }
 
+        [ForeignKey("RoleId")]
+        public virtual Role Role { get; set; }
+
+        public int RoleId { get; set; }
+
         [Timestamp]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime? CreateAt { get; set; } = DateTime.UtcNow;
     }
 }
