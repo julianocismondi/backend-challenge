@@ -1,5 +1,6 @@
 ﻿using backend_challenge.DataAccess;
 using backend_challenge.Dto;
+using backend_challenge.Models.Dto;
 using backend_challenge.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -45,7 +46,7 @@ namespace backend_challenge.Controllers
         [HttpPost]
         [Route("[action]")]
         [AllowAnonymous]
-        public async Task<IActionResult> CreateUser([FromBody] UserDto userDto)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto userDto)
         {
             if (userDto == null)
             {

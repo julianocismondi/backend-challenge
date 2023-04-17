@@ -74,6 +74,7 @@ namespace backend_challenge.Services
             var obj = new
             {
                 Id = user.Id,
+                Name = user.Name,
                 Email = user.Email,
                 Role = role.Name
             };

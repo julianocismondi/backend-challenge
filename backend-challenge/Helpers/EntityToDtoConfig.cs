@@ -11,6 +11,7 @@ namespace backend_challenge.Helpers
         {
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<User, AuthDto>().ReverseMap();
+            CreateMap<User, CreateUserDto>().ReverseMap();
         }
     }
 }

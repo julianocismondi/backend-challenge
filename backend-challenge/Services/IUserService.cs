@@ -1,10 +1,11 @@
 ﻿using backend_challenge.Dto;
+using backend_challenge.Models.Dto;
 
 namespace backend_challenge.Services
 {
     public interface IUserService
     {
-        public Task CreateAsync(UserDto userDto);
+        public Task CreateAsync(CreateUserDto userDto);
         public Task<List<UserDto>> GetListAsync();
 
         public Task<UserDto> GetAsync(int id);
