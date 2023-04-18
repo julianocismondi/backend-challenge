@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Security.Policy;
-using System.Text.Json.Serialization;
 
 namespace backend_challenge.Models
 {

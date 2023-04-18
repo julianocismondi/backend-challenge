@@ -12,20 +12,21 @@ namespace backend_challenge.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
-       
+
         public UserService(ApplicationDbContext db, IMapper mapper)
         {
             _db = db;
-            _mapper = mapper; 
+            _mapper = mapper;
         }
         public async Task CreateAsync(CreateUserDto userDto)
         {
             userDto.Password = HashPass.HashPassword(userDto.Password);
-          
+
             var entity = _mapper.Map<User>(userDto);
 
             entity.RoleId = 2;
-            
+            entity.CreateAt = DateTime.Now;
+
             await _db.Users.AddAsync(entity);
             await _db.SaveChangesAsync();
         }
@@ -35,7 +36,7 @@ namespace backend_challenge.Services
             try
             {
                 var userDto = await _db.Users.FirstOrDefaultAsync(x => x.Id == id);
-                if( userDto is null)
+                if (userDto is null)
                 {
                     return false;
                 }
@@ -45,7 +46,7 @@ namespace backend_challenge.Services
             }
             catch (Exception ex)
             {
-               throw new Exception("Ourrió un error");
+                throw new Exception("Ourrió un error");
             }
         }
 
@@ -63,15 +64,29 @@ namespace backend_challenge.Services
             return resultDto;
         }
 
-        public Task<UserDto> Update(UserDto userDto)
+        public async Task<bool> Update(UpdateUserDto updateUserDto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _db.Users.FirstOrDefaultAsync(x => x.Id == updateUserDto.Id);
+                result.Name = updateUserDto.Name;
+                result.Email = updateUserDto.Email;
+                result.RoleId = updateUserDto.RoleId;
+
+                var entity = _db.Users.Update(result);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public async Task<bool> ValidateUserExist(string email)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
-           return user == null ? false : true;
+            return user == null ? false : true;
         }
     }
 }

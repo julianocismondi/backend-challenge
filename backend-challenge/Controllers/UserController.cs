@@ -1,17 +1,13 @@
-﻿using backend_challenge.DataAccess;
-using backend_challenge.Dto;
-using backend_challenge.Models.Dto;
+﻿using backend_challenge.Models.Dto;
 using backend_challenge.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend_challenge.Controllers
 {
     [ApiController]
     [Route("[controller]")]
- 
+
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -32,7 +28,7 @@ namespace backend_challenge.Controllers
 
         [HttpGet]
         [Route("[action]/{id}")]
-        [Authorize (Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUserById([FromRoute] int id)
         {
             var result = await _userService.GetAsync(id);
@@ -64,7 +60,7 @@ namespace backend_challenge.Controllers
         }
         [HttpDelete]
         [Route("[action]/{id}")]
-        [Authorize (Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser([FromRoute] int id)
         {
             var response = await _userService.Delete(id);
@@ -73,6 +69,16 @@ namespace backend_challenge.Controllers
                 return BadRequest();
             }
             return NoContent();
+        }
+
+        [HttpPut]
+        [Route("[action]")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto updateUserDto)
+        {
+            var response = await _userService.Update(updateUserDto);
+
+            return Ok(response);
         }
     }
 }

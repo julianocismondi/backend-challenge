@@ -2,7 +2,6 @@
 using System.Text;
 
 namespace backend_challenge.Helpers
-
 {
     public static class HashPass
     {
@@ -11,10 +10,7 @@ namespace backend_challenge.Helpers
             using (var sha256 = new SHA256Managed())
             {
                 var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                // Convertimos los bytes hash en una cadena hexadecimal
                 var hash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
-
                 return hash;
             }
         }
@@ -25,7 +21,6 @@ namespace backend_challenge.Helpers
             {
                 var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
 
-                // Convertimos los bytes hash en una cadena hexadecimal
                 var hash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
 
                 return hash == hashedPassword;

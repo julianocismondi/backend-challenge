@@ -1,7 +1,6 @@
 ﻿using backend_challenge.Helpers;
 using backend_challenge.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 namespace backend_challenge.DataAccess
 {
