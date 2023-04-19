@@ -28,11 +28,11 @@ namespace backend_challenge.Services
 
             if (result is null)
             {
-                throw new Exception("Usuario no encontrado");
+                throw new KeyNotFoundException("No se encontró el usuario");
             };
             if (!HashPass.VerifyPassword(password, result.Password))
             {
-                throw new Exception("Contraseña incorrecta");
+                throw new AppException("Contraseña incorrecta");
             }
             var authDto = _mapper.Map<AuthDto>(result);
             return authDto;
@@ -42,12 +42,12 @@ namespace backend_challenge.Services
         {
             var currentUser = await AuthenticateAsync(email, password);
             var role = await _db.Roles.FirstOrDefaultAsync(r => r.Id == currentUser.RoleId);
-
-
             var keyBytes = Encoding.ASCII.GetBytes(_secretKey);
             var claims = new ClaimsIdentity();
+
             claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, currentUser.Email));
             claims.AddClaim(new Claim(ClaimTypes.Role, role.Name));
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claims,
@@ -63,9 +63,12 @@ namespace backend_challenge.Services
 
         public async Task<object> GetProfile(string token)
         {
+            if (token is null)
+            {
+                throw new AppException("Token vacío");
+            }
             var jwtHandler = new JwtSecurityTokenHandler();
             var jwt = token.Split(" ")[1];
-
             var data = jwtHandler.ReadJwtToken(jwt);
             var userEmail = data.Claims.First(claim => claim.Type == "nameid").Value;
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
@@ -82,5 +85,4 @@ namespace backend_challenge.Services
             return obj;
         }
     }
-
 }
