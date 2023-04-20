@@ -1,19 +1,22 @@
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+EXPOSE 80
+
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+
 WORKDIR /sln
-
-# Copia el archivo de solucion .sln
-COPY *.sln .
-
-# Copia todos los proyectos .csproj de la carpeta src/
-COPY *.csproj ./
-
-RUN dotnet restore
 
 COPY . .
 
-RUN dotnet publish -c Release -o /app
+RUN dotnet restore
 
-FROM base AS final
+COPY ./backend-challenge/. ./backend-challenge/
+
+FROM build AS publish
+
+RUN dotnet publish "backend-challenge/backend-challenge.csproj" -c Release -o /app
+
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS run
+
 WORKDIR /app
-COPY --from=build /app .
+COPY --from=publish /app ./
 ENTRYPOINT ["dotnet", "backend-challenge.dll"]
