@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>backend_challenge.DataAccess</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.15" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.15" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\backend-challenge.Domain\backend-challenge.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
