@@ -1,32 +1,31 @@
 ﻿using AutoMapper;
 using backend_challenge.Business.Dtos;
 using backend_challenge.Business.Helpers;
-using backend_challenge.DataAccess.Context;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
 using backend_challenge.DataAccess.Helpers;
+using backend_challenge.DataAccess.Configuration;
 
 namespace backend_challenge.Business.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IUnitOfWork _uow;
         private readonly string _secretKey;
         private readonly IMapper _mapper;
-        public AuthService(ApplicationDbContext db, IConfiguration config, IMapper mapper)
+        public AuthService(IUnitOfWork uow, IConfiguration config, IMapper mapper)
         {
-            _db = db;
+            _uow = uow;
             _secretKey = config.GetSection("Jwt").GetSection("SecretKey").ToString();
             _mapper = mapper;
         }
 
         public async Task<AuthDto> AuthenticateAsync(string email, string password)
         {
-            var result = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var result = await _uow.Users.GetUserByEmailAsync(email);
 
             if (result is null)
             {
@@ -43,12 +42,11 @@ namespace backend_challenge.Business.Services
         public async Task<string> GenerateTokenAsync(string email, string password)
         {
             var currentUser = await AuthenticateAsync(email, password);
-            var role = await _db.Roles.FirstOrDefaultAsync(r => r.Id == currentUser.RoleId);
             var keyBytes = Encoding.ASCII.GetBytes(_secretKey);
             var claims = new ClaimsIdentity();
 
             claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, currentUser.Email));
-            claims.AddClaim(new Claim(ClaimTypes.Role, role.Name));
+            claims.AddClaim(new Claim(ClaimTypes.Role, currentUser.Role.Name));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -63,7 +61,7 @@ namespace backend_challenge.Business.Services
             return tokenString;
         }
 
-        public async Task<object> GetProfile(string token)
+        public async Task<UserDto> GetProfile(string token)
         {
             if (token is null)
             {
@@ -73,18 +71,11 @@ namespace backend_challenge.Business.Services
             var jwt = token.Split(" ")[1];
             var data = jwtHandler.ReadJwtToken(jwt);
             var userEmail = data.Claims.First(claim => claim.Type == "nameid").Value;
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
-            var role = await _db.Roles.FirstOrDefaultAsync(r => r.Id == user.RoleId);
+            var userEntity = await _uow.Users.GetUserByEmailAsync(userEmail.ToLower().Trim());
 
-            var obj = new
-            {
-                user.Id,
-                user.Name,
-                user.Email,
-                Role = role.Name
-            };
+            var userDto = _mapper.Map<UserDto>(userEntity);
 
-            return obj;
+            return userDto;
         }
     }
 }

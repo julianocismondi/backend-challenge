@@ -22,8 +22,7 @@ namespace backend_challenge.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUsers()
         {
-            var result = await _userService.GetListAsync();
-            return result == null ? NotFound() : Ok(result);
+            return Ok(await _userService.GetListAsync());
         }
 
         [HttpGet]
@@ -31,12 +30,7 @@ namespace backend_challenge.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUserById([FromRoute] int id)
         {
-            var result = await _userService.GetAsync(id);
-
-            return result == null ? NotFound(new
-            {
-                ErrorMessage = "Usuario no encontrado"
-            }) : Ok(result);
+            return Ok(await _userService.GetAsync(id));
         }
 
         [HttpPost]
@@ -49,12 +43,6 @@ namespace backend_challenge.Controllers
                 return BadRequest(userDto);
             };
 
-            if (await _userService.ValidateUserExist(userDto.Email))
-            {
-                ModelState.AddModelError("ErrorMessage", "El email ya se encuentra registrado");
-                return BadRequest(ModelState);
-            }
-
             await _userService.CreateAsync(userDto);
             return NoContent();
         }
@@ -63,11 +51,8 @@ namespace backend_challenge.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser([FromRoute] int id)
         {
-            var response = await _userService.Delete(id);
-            if (!response)
-            {
-                return BadRequest();
-            }
+           await _userService.DeleteAsync(id);
+
             return NoContent();
         }
 
@@ -76,9 +61,8 @@ namespace backend_challenge.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto updateUserDto)
         {
-            var response = await _userService.Update(updateUserDto);
-
-            return Ok(response);
+            await _userService.UpdateAsync(updateUserDto);
+            return NoContent();
         }
     }
 }

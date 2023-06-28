@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace backend_challenge.Migrations
+namespace backend_challenge.DataAccess.Migrations
 {
-    public partial class ADD_TABLE_USERS_AND_ROLES : Migration
+    public partial class firstmigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

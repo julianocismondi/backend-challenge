@@ -8,6 +8,7 @@ namespace backend_challenge.Business.Helpers
     {
         public EntityToDtoConfig()
         {
+            CreateMap<User, UpdateUserDto>().ReverseMap();
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<User, AuthDto>().ReverseMap();
             CreateMap<User, CreateUserDto>().ReverseMap();

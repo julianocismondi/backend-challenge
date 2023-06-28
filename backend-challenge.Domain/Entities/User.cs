@@ -15,12 +15,12 @@ namespace backend_challenge.Domain.Entities
         [Required]
         public string Password { get; set; }
 
+        public int RoleId { get; set; }
+
         [ForeignKey("RoleId")]
         public virtual Role Role { get; set; }
 
-        public int RoleId { get; set; }
-
         [Timestamp]
-        public DateTime? CreateAt { get; set; } = DateTime.UtcNow;
+        public DateTime? CreateAt { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using backend_challenge.Domain.Entities;
+using System.Text.Json.Serialization;
 
 namespace backend_challenge.Business.Dtos
 {
@@ -10,6 +11,6 @@ namespace backend_challenge.Business.Dtos
         public string Email { get; set; }
         [JsonIgnore]
         public string Password { get; set; }
-        public int RoleId { get; set; }
+        public Role Role { get; set; }
     }
 }

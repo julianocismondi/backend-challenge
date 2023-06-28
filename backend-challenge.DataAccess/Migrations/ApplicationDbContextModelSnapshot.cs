@@ -8,7 +8,7 @@ using backend_challenge.DataAccess.Context;
 
 #nullable disable
 
-namespace backend_challenge.Migrations
+namespace backend_challenge.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -17,12 +17,12 @@ namespace backend_challenge.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.15")
+                .HasAnnotation("ProductVersion", "6.0.18")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("backend_challenge.Models.Role", b =>
+            modelBuilder.Entity("backend_challenge.Domain.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -51,7 +51,7 @@ namespace backend_challenge.Migrations
                         });
                 });
 
-            modelBuilder.Entity("backend_challenge.Models.User", b =>
+            modelBuilder.Entity("backend_challenge.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,7 +89,6 @@ namespace backend_challenge.Migrations
                         new
                         {
                             Id = 1,
-                            CreateAt = new DateTime(2023, 4, 5, 4, 53, 37, 662, DateTimeKind.Utc).AddTicks(521),
                             Email = "admin@gmail.com",
                             Name = "Admin",
                             Password = "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
@@ -97,9 +96,9 @@ namespace backend_challenge.Migrations
                         });
                 });
 
-            modelBuilder.Entity("backend_challenge.Models.User", b =>
+            modelBuilder.Entity("backend_challenge.Domain.Entities.User", b =>
                 {
-                    b.HasOne("backend_challenge.Models.Role", "Role")
+                    b.HasOne("backend_challenge.Domain.Entities.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
