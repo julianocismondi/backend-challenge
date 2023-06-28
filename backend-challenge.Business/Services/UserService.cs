@@ -1,21 +1,20 @@
 ﻿using AutoMapper;
 using backend_challenge.Business.Dtos;
 using backend_challenge.Business.Helpers;
-using backend_challenge.DataAccess.Context;
+using backend_challenge.DataAccess.Configuration;
 using backend_challenge.DataAccess.Helpers;
 using backend_challenge.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace backend_challenge.Business.Services
 {
     public class UserService : IUserService
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
-        public UserService(ApplicationDbContext db, IMapper mapper)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _db = db;
+            _uow = unitOfWork;
             _mapper = mapper;
         }
         public async Task CreateAsync(CreateUserDto userDto)
@@ -24,86 +23,45 @@ namespace backend_challenge.Business.Services
             var entity = _mapper.Map<User>(userDto);
 
             entity.RoleId = 2;
-            entity.CreateAt = DateTime.Now;
 
-            await _db.Users.AddAsync(entity);
-            await _db.SaveChangesAsync();
+            await _uow.Users.Create(entity);
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            var userDto = await _db.Users.FirstOrDefaultAsync(x => x.Id == id);
-            if (userDto is null)
-            {
-                throw new KeyNotFoundException("No se encontró el usuario");
-            }
             try
             {
-                _db.Users.Remove(userDto);
-                await _db.SaveChangesAsync();
-                return true;
+                await _uow.Users.Delete(id);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new AppException("Error al eliminar el usuario");
+
+                throw new AppException(ex.Message);
             }
         }
 
         public async Task<List<UserDto>> GetListAsync()
         {
-            try
-            {
-                List<User> result = await _db.Users.ToListAsync();
+            var users = await _uow.Users.GetAllUsersAsync();
 
-                var resultDto = _mapper.Map<List<UserDto>>(result);
-                return resultDto;
-            }
-            catch (Exception)
-            {
-
-                throw new AppException("Error al intentar obtener lista de usuarios");
-            }
+            return _mapper.Map<List<UserDto>>(users);
         }
 
         public async Task<UserDto> GetAsync(int id)
         {
-            var result = await _db.Users.FirstOrDefaultAsync(x => x.Id == id);
-            if (result is null)
-            {
-                throw new KeyNotFoundException("No se encontró el usuario");
-            }
-            var resultDto = _mapper.Map<UserDto>(result);
-            return resultDto;
+            var user = await _uow.Users.GetUserByIdAsync(id);
+
+            return _mapper.Map<UserDto>(user);
         }
 
-        public async Task<bool> Update(UpdateUserDto updateUserDto)
+        public async Task UpdateAsync(UpdateUserDto updateUserDto)
         {
-            try
-            {
-                var result = await _db.Users.FirstOrDefaultAsync(x => x.Id == updateUserDto.Id);
-                if (result is null)
-                {
-                    throw new KeyNotFoundException("No se encontró el usuario que intenta actualizar");
-                }
-                result.Name = updateUserDto.Name;
-                result.Email = updateUserDto.Email;
-                result.RoleId = updateUserDto.RoleId;
+            User userEntity = await _uow.Users.GetById(updateUserDto.Id);
+            userEntity.Name = updateUserDto.Name;
+            userEntity.Email = updateUserDto.Email;
+            userEntity.RoleId = updateUserDto.RoleId;
 
-                var entity = _db.Users.Update(result);
-                await _db.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception)
-            {
-                throw new AppException("Error al intentar actualizar el usuarios");
-            }
-        }
-
-        public async Task<bool> ValidateUserExist(string email)
-        {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
-
-            return user == null ? false : true;
+            await _uow.Users.Update(userEntity);
         }
     }
 }

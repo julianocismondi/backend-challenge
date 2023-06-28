@@ -6,6 +6,6 @@ namespace backend_challenge.Business.Services
     {
         public Task<AuthDto> AuthenticateAsync(string username, string password);
         public Task<string> GenerateTokenAsync(string username, string password);
-        public Task<object> GetProfile(string token);
+        public Task<UserDto> GetProfile(string token);
     }
 }

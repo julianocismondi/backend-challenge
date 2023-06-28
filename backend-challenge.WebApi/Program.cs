@@ -1,7 +1,10 @@
 using AutoMapper;
 using backend_challenge.Business.Helpers;
 using backend_challenge.Business.Services;
+using backend_challenge.DataAccess.Configuration;
 using backend_challenge.DataAccess.Context;
+using backend_challenge.DataAccess.Repositories;
+using backend_challenge.DataAccess.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -32,6 +35,8 @@ builder.Services.AddAuthentication(config => { config.DefaultAuthenticateScheme 
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddControllers();
 var mappingConfig = new MapperConfiguration(mc =>
@@ -43,7 +48,6 @@ IMapper mapper = mappingConfig.CreateMapper();
 
 builder.Services.AddSingleton(mapper);
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opt =>
 {
@@ -74,6 +78,12 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    context.Database.Migrate();
+}
 
 //Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
